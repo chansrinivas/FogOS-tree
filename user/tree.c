@@ -66,11 +66,15 @@ int contains_valid_file(char *path, char *file_ext) {
     return 0;  // No valid files found
 }
 
-void tree(char *path, int depth, int *last, char *file_ext, int show_size, int show_count) {
+void tree(char *path, int depth, int *last, char *file_ext, int show_size, int show_count, int limit_depth) {
     char buf[512], *p;
     int fd;
     struct dirent de;
     struct stat st;
+
+    if (limit_depth != -1 && depth > limit_depth) {
+        return;
+    }
 
     if ((fd = open(path, 0)) < 0) {
         printf("tree: cannot open %s\n", path);
@@ -219,7 +223,7 @@ int main(int argc, char *argv[]) {
     int last[128]; 
     memset(last, 0, sizeof(last));  
 
-    tree(start_dir, 0, last, file_ext, show_size, show_count);  
+    tree(start_dir, 0, last, file_ext, show_size, show_count, limit_depth);  
 
     exit(0);
 }
