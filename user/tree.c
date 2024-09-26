@@ -196,7 +196,8 @@ int main(int argc, char *argv[]) {
     char *start_dir = "."; 
     char *file_ext = 0;
     int show_size = 0;
-    int show_count = 0;  
+    int show_count = 0;
+    int limit_depth = -1; // -1 = default no limit
 
 
     for (int i = 1; i < argc; i++) {
@@ -207,6 +208,9 @@ int main(int argc, char *argv[]) {
             show_size = 1;
         } else if (strcmp(argv[i], "-C") == 0) {  
             show_count = 1;
+        } else if (strcmp(argv[i], "-L") == 0) {
+            limit_depth = atoi(argv[i+1]);
+            i++;
         } else {
             start_dir = argv[i];
         }
