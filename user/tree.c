@@ -150,7 +150,7 @@ void tree(char *path, int depth, int *last, char *file_ext, int show_size, int s
             last[depth] = (i == dir_count + file_count - 1);
 
             // Recursive call to tree
-            tree(buf, depth + 1, last, file_ext, show_size, show_count);
+            tree(buf, depth + 1, last, file_ext, show_size, show_count, limit_depth);
 
             p = saved_p;
             i++;
