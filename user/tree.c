@@ -6,7 +6,7 @@
 
 void print_tree_prefix(int depth, int *last);
 
-void tree(char *path, int depth, int *last) {
+void tree(char *path, int depth, int *last, char *file_ext, int show_size) {
     char buf[512], *p;
     int fd;
     struct dirent de;
@@ -58,16 +58,22 @@ void tree(char *path, int depth, int *last) {
 
             last[depth] = (i == entry_count - 1);
 
-            tree(buf, depth + 1, last);
+            tree(buf, depth + 1, last, file_ext, show_size);
 
             p = saved_p; 
             i++;
         }
         
     } else {
-		 print_tree_prefix(depth, last);
-		 printf("%s\n", path);
-		}
+		print_tree_prefix(depth, last);
+
+        // If the show_size flag is enabled, print the file size
+        if (show_size) {
+            printf("%s (size: %d bytes)\n", path, st.size);
+        } else {
+            printf("%s\n", path);
+        }
+	}
 
 	close(fd);
 }
@@ -90,15 +96,27 @@ void print_tree_prefix(int depth, int *last) {
 
 
 int main(int argc, char *argv[]) {
-    char *start_dir = ".";  
-    if (argc > 1) {
-        start_dir = argv[1]; 
+    char *start_dir = "."; 
+    char *file_ext = 0;
+    int show_size = 0;
+    
+    for (int i = 1; i < argc; i++) {
+    	if (strcmp(argv[i], "-F") == 0) {
+    		i++;
+    	 	file_ext = argv[i];
+    	 	printf("File extension: %s\n", file_ext);	
+    	}
+    	if (strcmp(argv[i], "-S") == 0) {
+    		show_size = 1;
+    	} else {
+    		start_dir = argv[i];
+    	}
     }
-
+	
     int last[128]; 
     memset(last, 0, sizeof(last));  
 
-    tree(start_dir, 0, last);
+    tree(start_dir, 0, last, file_ext, show_size);
 
     exit(0);
 }
