@@ -23,7 +23,7 @@ int contains_valid_file(char *path, char *file_ext) {
     struct stat st;
 
     if ((fd = open(path, 0)) < 0) {
-        return 0;  // Cannot open directory
+        return 0; 
     }
 
     strcpy(buf, path);
