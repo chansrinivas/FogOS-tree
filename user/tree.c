@@ -6,6 +6,14 @@
 
 void print_tree_prefix(int depth, int *last);
 
+
+/**
+ * finds the last occurrence of a char in a string
+ *
+ * @param s - string to be searched in
+ * @param c - character to find
+ * @return - pointer to the last occurrence of the char in the string
+ */
 char* strrchr(const char* s, int c) {
     const char* last = 0;
     for (; *s; s++) {
@@ -16,6 +24,14 @@ char* strrchr(const char* s, int c) {
     return (char*)last;
 }
 
+
+/**
+ * checks if a dir contains a valid file matching the ext
+ *
+ * @param path - path of the dir to check
+ * @param file_ext - file ext to look for
+ * @return - 1 if a valid file is found and 0 otherwise
+ */
 int contains_valid_file(char *path, char *file_ext) {
     char buf[512], *p;
     int fd;
@@ -66,6 +82,17 @@ int contains_valid_file(char *path, char *file_ext) {
     return 0;  // No valid files found
 }
 
+
+/**
+ * recursively traverses and prints the directory structure
+ *
+ * @param path - curr directory path
+ * @param depth - curr depth in the directory tree
+ * @param last - array indicating if the current node is the last in its level
+ * @param file_ext - file ext to filter files
+ * @param show_size - flag indicating whether to display file sizes
+ * @param show_count - flag indicating whether to display counts of directories and files
+ */
 void tree(char *path, int depth, int *last, char *file_ext, int show_size, int show_count, int limit_depth) {
     char buf[512], *p;
     int fd;
@@ -178,7 +205,13 @@ void tree(char *path, int depth, int *last, char *file_ext, int show_size, int s
     close(fd);
 }
           	
-            	
+
+/**
+ * prints the prefix for the current tree level based on depth 
+ *
+ * @param depth - current depth in the directory tree
+ * @param last - array indicating if the current node is the last in its level
+ */
 void print_tree_prefix(int depth, int *last) {
     for (int i = 0; i < depth - 1; i++) {
         if (last[i])
@@ -195,13 +228,19 @@ void print_tree_prefix(int depth, int *last) {
 }
 
 
-
+/**
+ * main function to parse command-line arguments and initiate the tree traversal
+ *
+ * @param argc - number of command-line arguments
+ * @param argv - array of command-line argument strings
+ * @return - 0 on successful tree traversal and printing
+ */
 int main(int argc, char *argv[]) {
     char *start_dir = "."; 
     char *file_ext = 0;
     int show_size = 0;
     int show_count = 0;
-    int limit_depth = -1; // -1 = default no limit
+    int limit_depth = -1; 
 
 
     for (int i = 1; i < argc; i++) {
