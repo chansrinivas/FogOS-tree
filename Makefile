@@ -1,6 +1,8 @@
 K=kernel
 U=user
 
+DIRS = dir1 dir2 
+
 OBJS = \
   $K/entry.o \
   $K/start.o \
@@ -134,8 +136,11 @@ UPROGS=\
 	$U/_wc\
 	$U/_zombie\
 
-fs.img: mkfs/mkfs README.md $(UPROGS)
-	mkfs/mkfs fs.img README.md $(UPROGS)
+
+fs.img: mkfs/mkfs README.md $(UPROGS) $(DIRS)
+	mkfs/mkfs fs.img README.md $(UPROGS) $(DIRS)	
+
+
 
 -include kernel/*.d user/*.d
 
