@@ -141,10 +141,11 @@ void tree(char *path, int depth, int *last, char *file_ext, int show_size, int s
         int valid_for_print = (file_ext == 0 || contains_valid_file(path, file_ext));
         if (!show_count && valid_for_print) {
             print_tree_prefix(depth, last);
-            printf("%s/\n", path);
+            printf("%s/\n", strrchr(path, '/'));
         }
 
-        char buf[512], *p;
+        char buf[512] = ""; 
+        char *p;
         strcpy(buf, path);
         p = buf + strlen(buf);
         *p++ = '/';
@@ -198,9 +199,9 @@ void tree(char *path, int depth, int *last, char *file_ext, int show_size, int s
         if (!show_count) {
             print_tree_prefix(depth, last);
             if (show_size) {
-                printf("%s (size: %d bytes)\n", path, st.size);
+                printf("%s (size: %d bytes)\n", strrchr(path, '/') + 1, st.size);  
             } else {
-                printf("%s\n", path);
+                printf("%s\n", strrchr(path, '/') ); 
             }
         }
     }
