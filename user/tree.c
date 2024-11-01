@@ -10,7 +10,8 @@
  * @param depth - current depth in the directory tree
  * @param last - array indicating if the current node is the last in its level
  */
-void print_tree_prefix(int depth, int *last) {
+void 
+print_tree_prefix(int depth, int *last) {
     for (int i = 0; i < depth - 1; i++) {
         if (last[i])
             printf("    "); 
@@ -31,7 +32,8 @@ void print_tree_prefix(int depth, int *last) {
  * @param name - name of dir to check
  * @return 1 - if it is a special dir
  */
-int is_special_dir(const char *name) {
+int 
+is_special_dir(const char *name) {
     return strcmp(name, ".") == 0 || strcmp(name, "..") == 0;
 }
 
@@ -41,7 +43,8 @@ int is_special_dir(const char *name) {
  * @param path - path of the dir to open
  * @return - file descriptor for the opened dir
  */
-int open_directory(const char *path) {
+int 
+open_directory(const char *path) {
     int fd = open(path, 0);
     if (fd < 0) {
         fprintf(2, "tree: cannot open %s\n", path);
@@ -56,7 +59,8 @@ int open_directory(const char *path) {
  * @param c - character to find
  * @return - pointer to the last occurrence of the char in the string
  */
-char* strrchr(const char* s, int c) {
+char* 
+strrchr(const char* s, int c) {
     const char* last = 0;
     for (; *s; s++) {
         if (*s == (char)c) {
@@ -73,7 +77,8 @@ char* strrchr(const char* s, int c) {
  * @param file_ext - file ext to look for
  * @return - 1 if a valid file is found and 0 otherwise
  */
-int contains_valid_file(char *path, char *file_ext) {
+int 
+contains_valid_file(char *path, char *file_ext) {
     char buf[512], *p;
     int fd = open_directory(path);
     if (fd < 0) return 0;
@@ -124,7 +129,8 @@ int contains_valid_file(char *path, char *file_ext) {
  * @param show_size - flag indicating whether to display file sizes
  * @param show_count - flag indicating whether to display counts of directories and files
  */
-void tree(char *path, int depth, int *last, char *file_ext, int show_size, int show_count, int limit_depth) {
+void 
+tree(char *path, int depth, int *last, char *file_ext, int show_size, int show_count, int limit_depth) {
     if (limit_depth != -1 && depth > limit_depth) return;
 
     int fd = open_directory(path);
@@ -142,7 +148,7 @@ void tree(char *path, int depth, int *last, char *file_ext, int show_size, int s
         int valid_for_print = (file_ext == 0 || contains_valid_file(path, file_ext));
         if (!show_count && valid_for_print) {
             print_tree_prefix(depth, last);
-            printf("%s/\n", strrchr(path, '/'));
+            printf("%.256s/\n", strrchr(path, '/'));
         }
 
         char buf[512] = ""; 
@@ -225,7 +231,7 @@ void tree(char *path, int depth, int *last, char *file_ext, int show_size, int s
             if (show_size) {
                 printf("%s (size: %d bytes)\n", strrchr(path, '/') + 1, st.size);  
             } else {
-                printf("%s\n", strrchr(path, '/')); 
+                printf("%.256s/\n", strrchr(path, '/')); 
             }
         }
     }
@@ -241,7 +247,8 @@ void tree(char *path, int depth, int *last, char *file_ext, int show_size, int s
  * @param argv - array of command-line argument strings
  * @return - 0 on successful tree traversal and printing
  */
-int main(int argc, char *argv[]) {
+int 
+main(int argc, char *argv[]) {
     char *start_dir = "."; 
     char *file_ext = 0;
     int show_size = 0;
