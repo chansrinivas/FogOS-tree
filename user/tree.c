@@ -137,7 +137,8 @@ void tree(char *path, int depth, int *last, char *file_ext, int show_size, int s
         close(fd);
         return;
     }
-	if (st.type == T_DIR) {
+
+    if (st.type == T_DIR) {
         int valid_for_print = (file_ext == 0 || contains_valid_file(path, file_ext));
         if (!show_count && valid_for_print) {
             print_tree_prefix(depth, last);
@@ -153,8 +154,7 @@ void tree(char *path, int depth, int *last, char *file_ext, int show_size, int s
         int file_count = 0, dir_count = 0;
 
         while (read(fd, &de, sizeof(de)) == sizeof(de)) {
-            if (de.inum == 0 || is_special_dir(de.name))
-                continue;
+            if (de.inum == 0 || is_special_dir(de.name)) continue;
 
             memmove(p, de.name, strlen(de.name));
             p[strlen(de.name)] = 0;
@@ -165,9 +165,33 @@ void tree(char *path, int depth, int *last, char *file_ext, int show_size, int s
             else if (!file_ext || (strrchr(buf, '.') && strcmp(strrchr(buf, '.'), file_ext) == 0)) file_count++;
         }
 
-        if (show_count) {
+        if (show_count && show_size) {
             print_tree_prefix(depth, last);
             printf("%s/ [%d directories, %d files]\n", path, dir_count, file_count);
+
+            close(fd);
+            fd = open_directory(path);
+            if (fd < 0) return;
+
+            while (read(fd, &de, sizeof(de)) == sizeof(de)) {
+                if (de.inum == 0 || is_special_dir(de.name)) continue;
+
+                memmove(p, de.name, strlen(de.name));
+                p[strlen(de.name)] = 0;
+
+                if (stat(buf, &st) < 0) continue;
+
+                if (st.type != T_DIR) {
+                    print_tree_prefix(depth + 1, last);
+                    printf("└── %s (size: %d bytes)\n", de.name, st.size);
+                }
+            }
+        } else if (show_count) {
+            print_tree_prefix(depth, last);
+            printf("%s/ [%d directories, %d files]\n", path, dir_count, file_count);
+        } else if (show_size) {
+            print_tree_prefix(depth, last);
+            printf("%s (size: %d bytes)\n", strrchr(path, '/') + 1, st.size);
         }
 
         close(fd);
@@ -201,7 +225,7 @@ void tree(char *path, int depth, int *last, char *file_ext, int show_size, int s
             if (show_size) {
                 printf("%s (size: %d bytes)\n", strrchr(path, '/') + 1, st.size);  
             } else {
-                printf("%s\n", strrchr(path, '/') ); 
+                printf("%s\n", strrchr(path, '/')); 
             }
         }
     }
@@ -228,7 +252,12 @@ int main(int argc, char *argv[]) {
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "-F") == 0) {
             if (i + 1 < argc) {
-                file_ext = argv[++i];
+            	if (argv[i+1][0] == '.') {
+            		file_ext = argv[++i];
+            	} else {
+            		fprintf(2, "tree: invalid value for -F\n");
+            		exit(1);
+            	}
             } else {
                 fprintf(2, "tree: missing argument for -F\n");
                 exit(1);
@@ -244,6 +273,9 @@ int main(int argc, char *argv[]) {
                 fprintf(2, "tree: missing argument for -L\n");
                 exit(1);
             }
+        } else if (argv[i][0] == '-') {
+        	fprintf(2, "tree: invalid flag %s\n", argv[i]);
+        	exit(1);
         } else {
             start_dir = argv[i];
         }
