@@ -122,6 +122,7 @@ contains_valid_file(char *path, char *file_ext) {
             return 1;
         }
     }
+    free(buf);
     close(fd);
     return 0;
 }
@@ -153,23 +154,23 @@ tree(char *path, int depth, int *last, char *file_ext, int show_size, int show_c
     }
 
 	
+    char *buf = malloc(512);
+    if (!buf) {
+        fprintf(2, "tree: memory allocation failed\n");
+        close(fd);
+        return;
+    }
+    char *p;
+    strcpy(buf, path);
+    p = buf + strlen(buf);
+    *p++ = '/';
+
     if (st.type == T_DIR) {
         int valid_for_print = (file_ext == 0 || contains_valid_file(path, file_ext));
         if (!show_count && valid_for_print) {
             print_tree_prefix(depth, last);
             printf("%s/\n", strrchr(path, '/'));
         }
-
-        char *buf = malloc(512);
-	    if (!buf) {
-	        fprintf(2, "tree: memory allocation failed\n");
-	        close(fd);
-	        return;
-	    }
-        char *p;
-        strcpy(buf, path);
-        p = buf + strlen(buf);
-        *p++ = '/';
 
         int file_count = 0, dir_count = 0;
 
@@ -249,7 +250,7 @@ tree(char *path, int depth, int *last, char *file_ext, int show_size, int show_c
             }
         }
     }
-
+	free(buf);
     close(fd);
 }
 
