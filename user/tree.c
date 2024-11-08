@@ -79,10 +79,18 @@ strrchr(const char* s, int c) {
  */
 int 
 contains_valid_file(char *path, char *file_ext) {
-    char buf[512], *p;
+    char *buf = malloc(512);
+    if (!buf) {
+        fprintf(2, "tree: memory allocation failed\n");
+        return 0;
+    }
+    char *p;
     int fd = open_directory(path);
-    if (fd < 0) return 0;
-
+    if (fd < 0) {
+        free(buf);
+        return 0;
+    }
+    
     struct dirent de;
     struct stat st;
     strcpy(buf, path);
@@ -144,6 +152,7 @@ tree(char *path, int depth, int *last, char *file_ext, int show_size, int show_c
         return;
     }
 
+	
     if (st.type == T_DIR) {
         int valid_for_print = (file_ext == 0 || contains_valid_file(path, file_ext));
         if (!show_count && valid_for_print) {
@@ -151,7 +160,12 @@ tree(char *path, int depth, int *last, char *file_ext, int show_size, int show_c
             printf("%s/\n", strrchr(path, '/'));
         }
 
-        char buf[512] = ""; 
+        char *buf = malloc(512);
+	    if (!buf) {
+	        fprintf(2, "tree: memory allocation failed\n");
+	        close(fd);
+	        return;
+	    }
         char *p;
         strcpy(buf, path);
         p = buf + strlen(buf);
